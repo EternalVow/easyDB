@@ -20,17 +20,19 @@ func TestClient(t *testing.T) {
 
 	sendSql(conn, "create table lili (a int, b int, c int);")
 
-	sendSql(conn, "desc lili")
+	sendSql(conn, "desc lili;")
 
-	sendSql(conn, "insert into lili (a, b, c) values (1, 1, 1)")
+	sendSql(conn, "insert into lili (a, b, c) values (1, 1, 1);")
 
-	sendSql(conn, "update lili set b = 12 WHERE a = 1")
+	sendSql(conn, "SELECT * FROM lili WHERE a = 1;")
 
-	sendSql(conn, "SELECT * FROM lili WHERE a = 'abc'")
+	sendSql(conn, "update lili set b = 12 WHERE a = 1;")
 
-	sendSql(conn, "DELETE  FROM lili WHERE a = 1")
+	sendSql(conn, "SELECT * FROM lili WHERE a = 1;")
 
-	sendSql(conn, "SELECT * FROM lili WHERE a = 'abc'")
+	sendSql(conn, "DELETE  FROM lili WHERE a = 1;")
+
+	sendSql(conn, "SELECT * FROM lili WHERE a = 1;")
 
 	//
 	//

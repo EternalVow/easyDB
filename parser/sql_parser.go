@@ -46,7 +46,14 @@ func SqlParser(sql string) string {
 		for _, row := range rows {
 			rowData := table.Row{}
 			for _, byteItem := range row {
-				rowData = append(rowData, string(byteItem))
+				// todo 返回需要制定类型，才知道这么转换
+				//目前都是数字
+				// 尝试将数字转字符
+
+				intStr := strconv.Itoa(int(byteItem))
+
+				//intStr := uint8(byteItem) + 48
+				rowData = append(rowData, string(intStr))
 			}
 			t.AppendRow(rowData)
 		}
@@ -208,9 +215,11 @@ func Select(stmt *sqlparser.Select) ([]string, [][]byte, error) {
 	// 解析 schema
 	headers := strings.Split(string(schema), ",")
 	// 遍历 keys
-	var result [][]byte
+	var result = make([][]byte, 0, len(headers))
 	for _, c := range keyMap {
-		result = append(result, c)
+		newc := make([]byte, len(c))
+		copy(newc, c)
+		result = append(result, newc)
 	}
 	return headers, result, nil
 }
@@ -310,9 +319,7 @@ func DescTable(stmt *sqlparser.Show) (string, error) {
 	if err := closer.Close(); err != nil {
 		log.Fatal(err)
 	}
-	if err := db.Close(); err != nil {
-		log.Fatal(err)
-	}
+
 	fmt.Printf("DescTable return  %s %s\n", ddlkey, ddlvalue)
 	return string(ddlvalue), err
 }
@@ -342,10 +349,6 @@ func InsertInto(stmt *sqlparser.Insert) (string, error) {
 	ddlvalue := string(value)
 	fmt.Printf("InsertInto %s %s\n", ddlkey, ddlvalue)
 	if err := closer.Close(); err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-	if err := db.Close(); err != nil {
 		log.Fatal(err)
 		return "", err
 	}
@@ -383,9 +386,14 @@ func InsertInto(stmt *sqlparser.Insert) (string, error) {
 			}
 			switch v.Type {
 			case sqlparser.StrVal:
-				rocksVal = append(rocksVal, rocksVal...)
+				rocksVal = append(rocksVal, v.Val...)
 			case sqlparser.IntVal:
-				rocksVal = append(rocksVal, rocksVal...)
+				// 转成int
+				intVal, err := strconv.Atoi(string(v.Val))
+				if err != nil {
+					return "", err
+				}
+				rocksVal = append(rocksVal, byte(intVal))
 			}
 
 		}

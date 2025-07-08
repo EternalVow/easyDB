@@ -36,7 +36,7 @@ func handleConn(c net.Conn) {
 		resp := parser.SqlParser(line)
 		fmt.Println("scanner resp:", resp)
 
-		c.Write([]byte("sql: " + line + "\n"))
-		c.Write([]byte("resp: " + resp + "\n"))
+		c.Write([]byte("sql:\n " + line + "\n"))
+		c.Write([]byte("resp:\n " + resp + "\n"))
 	}
 }
